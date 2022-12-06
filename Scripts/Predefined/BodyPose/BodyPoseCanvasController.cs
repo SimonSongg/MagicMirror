@@ -97,26 +97,26 @@ namespace OAKForUnity
         {
             landmarks = new Vector3[17];
             landmarks2D = new Vector2[17];
-            originalGameObject = GameObject.Find("UnitSkeleton");
-            Armature = originalGameObject.transform.GetChild(0).gameObject;
+            originalGameObject = GameObject.Find("Muscle");
+            Armature = originalGameObject.transform.GetChild(34).gameObject;
             RootBone = Armature.transform.GetChild(0).gameObject;
             Base = RootBone.transform.GetChild(0).gameObject;
-            HipBoneLeft = RootBone.transform.GetChild(1).gameObject;
-            HipBoneRight = RootBone.transform.GetChild(2).gameObject;
-            HipLeft = HipBoneLeft.transform.GetChild(0).gameObject;
-            HipRight = HipBoneRight.transform.GetChild(0).gameObject;
+            //HipBoneLeft = RootBone.transform.GetChild(1).gameObject;
+            //HipBoneRight = RootBone.transform.GetChild(2).gameObject;
+            HipLeft = RootBone.transform.GetChild(1).gameObject;
+            HipRight = RootBone.transform.GetChild(2).gameObject;
             KneeLeft = HipLeft.transform.GetChild(0).gameObject;
             KneeRight = HipRight.transform.GetChild(0).gameObject;
             Abdomen = Base.transform.GetChild(0).gameObject;
             Chest = Abdomen.transform.GetChild(0).gameObject;
-            ShoulderBoneLeft = Abdomen.transform.GetChild(1).gameObject;
-            ShoulderBoneRight = Abdomen.transform.GetChild(2).gameObject;
-            ShoulderLeft = ShoulderBoneLeft.transform.GetChild(0).gameObject;
-            ShoulderRight = ShoulderBoneRight.transform.GetChild(0).gameObject;
-            ElbowLeft = ShoulderLeft.transform.GetChild(0).gameObject;
-            ElbowRight = ShoulderRight.transform.GetChild(0).gameObject;
-            WristLeft = ElbowLeft.transform.GetChild(0).gameObject;
-            WristRight = ElbowRight.transform.GetChild(0).gameObject;
+            //ShoulderBoneLeft = Abdomen.transform.GetChild(7).gameObject;
+            //ShoulderBoneRight = Abdomen.transform.GetChild(8).gameObject;
+            ShoulderLeft = Abdomen.transform.GetChild(7).gameObject;
+            ShoulderRight = Abdomen.transform.GetChild(8).gameObject;
+            ElbowLeft = ShoulderLeft.transform.GetChild(2).gameObject;
+            ElbowRight = ShoulderRight.transform.GetChild(2).gameObject;
+            WristLeft = ElbowLeft.transform.GetChild(2).gameObject;
+            WristRight = ElbowRight.transform.GetChild(2).gameObject;
 
             wristL1 = new lowpassfilter(0.5f);
             wristL2 = new lowpassfilter(0.5f);
@@ -227,7 +227,7 @@ namespace OAKForUnity
             //RootBone.transform.position = new Vector3(RootBone.transform.position.x,RootBone.transform.position.y,0);
             //print(RootBone.transform.position);
             //Abdomen.transform.localPosition = new Vector3(0,(mainDis)*0.01f,0); // Y axis is the half of the link length between the hip and the shoulder
-            Abdomen.transform.localPosition = new Vector3(0,hip2shoulder*0.0007046875f,0);
+            Abdomen.transform.localPosition = new Vector3(0,hip2shoulder*0.08578125f,0);
 
             Chest.transform.localPosition = new Vector3(0,0.001f,0);
 
@@ -237,17 +237,17 @@ namespace OAKForUnity
             ShoulderBoneLeft.transform.eulerAngles = getAngleRight(landmarks2D[6],landmarks2D[5]);
             //ShoulderBoneRight.transform.eulerAngles = new Vector3(0.01f,0.01f,90);
             ShoulderBoneRight.transform.eulerAngles = getAngleRight(landmarks2D[5],landmarks2D[6]);
-            ShoulderLeft.transform.localPosition = new Vector3(0,shoulderHalfdis*0.0007046875f,0);
-            ShoulderRight.transform.localPosition = new Vector3(0,shoulderHalfdis*0.0007046875f,0);
+            ShoulderLeft.transform.localPosition = new Vector3(0,shoulderHalfdis*0.08578125f,0);
+            ShoulderRight.transform.localPosition = new Vector3(0,shoulderHalfdis*0.08578125f,0);
 
-            ElbowLeft.transform.localPosition = new Vector3(0,shoulder2elbowL*0.0007046875f,0);
-            ElbowRight.transform.localPosition = new Vector3(0,shoulder2elbowR*0.0007046875f,0);
+            ElbowLeft.transform.localPosition = new Vector3(0,shoulder2elbowL*0.08578125f,0);
+            ElbowRight.transform.localPosition = new Vector3(0,shoulder2elbowR*0.08578125f,0);
 
-            WristLeft.transform.localPosition = new Vector3(0,elbow2wristL*0.0007046875f,0);
-            WristRight.transform.localPosition = new Vector3(0,elbow2wristR*0.0007046875f,0);
+            WristLeft.transform.localPosition = new Vector3(0,elbow2wristL*0.08578125f,0);
+            WristRight.transform.localPosition = new Vector3(0,elbow2wristR*0.08578125f,0);
 
-            HipLeft.transform.localPosition = new Vector3(0,hipHalfdis*0.0007046875f,0);
-            HipRight.transform.localPosition = new Vector3(0,hipHalfdis*0.0007046875f,0);
+            HipLeft.transform.localPosition = new Vector3(0,hipHalfdis*0.08578125f,0);
+            HipRight.transform.localPosition = new Vector3(0,hipHalfdis*0.08578125f,0);
             print(getAngleLeft(wristLeftpos,elbowLeftpos));
             ElbowLeft.transform.eulerAngles = getAngleRight(landmarks2D[10],landmarks2D[8]);
             ElbowRight.transform.eulerAngles = getAngleLeft(landmarks2D[9],landmarks2D[7]);
