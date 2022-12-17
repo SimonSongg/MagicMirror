@@ -353,7 +353,9 @@ namespace OAKForUnity
             if (pipeline.deviceRunning && !_init) Init();
             bodyPoseResults.text = pipeline.bodyPoseResults;
             var json = JSON.Parse(pipeline.bodyPoseResults);
+            if (json == null) return;
             var arr = json["landmarks"];
+            print(json);
 
             //for (int i = 0; i<17; i++) landmarks[i] = Vector3.zero;
             
@@ -399,6 +401,7 @@ namespace OAKForUnity
             //Some distance calculation
             Vector2 hipmid2D;
             hipmid2D = (landmarks2D[11] + landmarks2D[12])/2;
+            //print(hipmid2D);
             Vector2 shouldermid2D = (landmarks2D[5] + landmarks2D[6])/2;
             float shoulderHalfdis = getDistance2D(landmarks2D[5],landmarks2D[6])/2;
             float hipHalfdis = getDistance2D(landmarks2D[11],landmarks2D[12])/2;
@@ -406,7 +409,11 @@ namespace OAKForUnity
             float shoulder2elbowL = getDistance2D(landmarks2D[5],landmarks2D[7]);
             float shoulder2elbowR = getDistance2D(landmarks2D[6],landmarks2D[8]);
             float elbow2wristL = getDistance2D(landmarks2D[7],landmarks2D[9]);
+            //Debug.Log(landmarks2D[9]);
+            //Debug.Log(elbow2wristL);
             float elbow2wristR = getDistance2D(landmarks2D[8],landmarks2D[10]);
+            //print(new Vector3(5.4f-hipmid2D.x*0.06854f,8.4f-hipmid2D.y*0.06792f,0));
+            Armature.transform.position = new Vector3(5.4f-hipmid2D.x*0.06854f,8.4f-hipmid2D.y*0.06792f,19.51f); //need to change
             
             //Determine the root position of the whole model
             RootBone.transform.localPosition = new Vector3(-0.0341f+hipmid2D.x*0.000484f,-0.0595f+hipmid2D.y*0.000484f,0f);
@@ -460,7 +467,7 @@ namespace OAKForUnity
             }
             angle.y = 0;
             
-            return angle;
+            return angle + new Vector3(0f, 180f, 0f);
         }
         Vector3 getAngleRight(Vector2 point1, Vector2 point2)
         {
