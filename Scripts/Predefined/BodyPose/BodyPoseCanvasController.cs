@@ -1,9 +1,3 @@
-/*
- * Canvas controller goal is decouple UI from pipeline (PredefinedBase) and unity device (OAKDevice)
- * In order to give some flexibility we're using Material as basic object with Texture2D
- * In that way we can use Image in Canvas UI or just Material in objects
- */
-
 using UnityEngine;
 using UnityEngine.UI;
 using SimpleJSON;
@@ -18,6 +12,7 @@ namespace OAKForUnity
         float storedvalue = 0;
         float rawvalue = 0;
         float output = 0;
+        
         public lowpassfilter(float a)
         {
             alpha = a;
@@ -92,32 +87,59 @@ namespace OAKForUnity
         lowpassfilter shoulderR1;
         lowpassfilter shoulderR2;
 
+        lowpassfilter hipL1;
+        lowpassfilter hipL2;
+        lowpassfilter hipR1;
+        lowpassfilter hipR2;
+
+        public TMPro.TMP_Dropdown m_Dropdown;
+        public GameObject dropdownObject;
+        int DropdownValue;
+
+        GameObject[] gameObjectArrayAbdoOut;
+        GameObject[] gameObjectArrayAbdoIn;
+        GameObject[] gameObjectArrayArms;
+        GameObject[] gameObjectArrayHead;
+
         // Start is called before the first frame update
         void Start()
         {
+            // Fatch all the gameobjects with tags
+            gameObjectArrayAbdoOut = GameObject.FindGameObjectsWithTag ("AbdominalOuter");
+            gameObjectArrayAbdoIn = GameObject.FindGameObjectsWithTag ("AbdominalInner");
+            gameObjectArrayArms = GameObject.FindGameObjectsWithTag ("Arms");
+            gameObjectArrayHead = GameObject.FindGameObjectsWithTag ("HeadNeck");
+            //Initialize dropdown menu
+            m_Dropdown = dropdownObject.GetComponent<TMPro.TMP_Dropdown>();
+            
+            m_Dropdown.onValueChanged.AddListener(delegate {
+            DropdownValueChanged(m_Dropdown);
+            });
+
+            // Initialize all the body segments
             landmarks = new Vector3[17];
             landmarks2D = new Vector2[17];
-            originalGameObject = GameObject.Find("UnitSkeleton");
-            Armature = originalGameObject.transform.GetChild(0).gameObject;
+            originalGameObject = GameObject.Find("Muscle (1)");
+            Armature = originalGameObject.transform.GetChild(34).gameObject;
             RootBone = Armature.transform.GetChild(0).gameObject;
             Base = RootBone.transform.GetChild(0).gameObject;
-            HipBoneLeft = RootBone.transform.GetChild(1).gameObject;
-            HipBoneRight = RootBone.transform.GetChild(2).gameObject;
-            HipLeft = HipBoneLeft.transform.GetChild(0).gameObject;
-            HipRight = HipBoneRight.transform.GetChild(0).gameObject;
-            KneeLeft = HipLeft.transform.GetChild(0).gameObject;
-            KneeRight = HipRight.transform.GetChild(0).gameObject;
+            
+            HipLeft = RootBone.transform.GetChild(1).gameObject;
+            HipRight = RootBone.transform.GetChild(2).gameObject;
+
+            
+
             Abdomen = Base.transform.GetChild(0).gameObject;
             Chest = Abdomen.transform.GetChild(0).gameObject;
-            ShoulderBoneLeft = Abdomen.transform.GetChild(1).gameObject;
-            ShoulderBoneRight = Abdomen.transform.GetChild(2).gameObject;
-            ShoulderLeft = ShoulderBoneLeft.transform.GetChild(0).gameObject;
-            ShoulderRight = ShoulderBoneRight.transform.GetChild(0).gameObject;
-            ElbowLeft = ShoulderLeft.transform.GetChild(0).gameObject;
-            ElbowRight = ShoulderRight.transform.GetChild(0).gameObject;
-            WristLeft = ElbowLeft.transform.GetChild(0).gameObject;
-            WristRight = ElbowRight.transform.GetChild(0).gameObject;
+            
+            ShoulderLeft = Abdomen.transform.GetChild(7).gameObject;
+            ShoulderRight = Abdomen.transform.GetChild(8).gameObject;
+            ElbowLeft = ShoulderLeft.transform.GetChild(2).gameObject;
+            ElbowRight = ShoulderRight.transform.GetChild(2).gameObject;
+            WristLeft = ElbowLeft.transform.GetChild(2).gameObject;
+            WristRight = ElbowRight.transform.GetChild(2).gameObject;
 
+            //Initialize lowpass filters
             wristL1 = new lowpassfilter(0.5f);
             wristL2 = new lowpassfilter(0.5f);
             wristR1 = new lowpassfilter(0.5f);
@@ -132,9 +154,188 @@ namespace OAKForUnity
             shoulderL2 = new lowpassfilter(0.5f);
             shoulderR1 = new lowpassfilter(0.5f);
             shoulderR2 = new lowpassfilter(0.5f);
+
+            hipL1 = new lowpassfilter(0.5f);
+            hipL2 = new lowpassfilter(0.5f);
+            hipR1 = new lowpassfilter(0.5f);
+            hipR2 = new lowpassfilter(0.5f);
             
         }
-
+        // When the dropdown menu was chosen, change the corresponding visulization
+        void DropdownValueChanged(TMPro.TMP_Dropdown change)
+        {
+            print(change.value);
+            DropdownValue = change.value;
+            //Outer
+            if (DropdownValue == 3)
+            {
+                
+ 
+                foreach(GameObject go in gameObjectArrayArms)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+ 
+                foreach(GameObject go in gameObjectArrayAbdoOut)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoIn)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+                foreach(GameObject go in gameObjectArrayHead)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+            }
+            //Inner
+            if (DropdownValue == 4)
+            {
+                
+ 
+                foreach(GameObject go in gameObjectArrayArms)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+ 
+                foreach(GameObject go in gameObjectArrayAbdoOut)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoIn)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+                foreach(GameObject go in gameObjectArrayHead)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+            }
+            else if (DropdownValue == 0)
+            {
+                
+ 
+                foreach(GameObject go in gameObjectArrayArms)
+                {
+                    //go.SetActive (true);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+ 
+                foreach(GameObject go in gameObjectArrayAbdoOut)
+                {
+                    //go.SetActive (true);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoIn)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+                foreach(GameObject go in gameObjectArrayHead)
+                {
+                    //go.SetActive (true);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+            }
+            else if (DropdownValue == 1)
+            {
+                foreach(GameObject go in gameObjectArrayArms)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.3f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoIn)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoOut)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.3f);
+                }
+                
+                foreach(GameObject go in gameObjectArrayHead)
+                {
+                    //go.SetActive (true);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+            }
+            else if (DropdownValue == 2)
+            {
+                foreach(GameObject go in gameObjectArrayArms)
+                {
+                    //go.SetActive (true);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,1f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoIn)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.2f);
+                }
+                foreach(GameObject go in gameObjectArrayAbdoOut)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.3f);
+                }
+                
+                foreach(GameObject go in gameObjectArrayHead)
+                {
+                    //go.SetActive (false);
+                    Color tempcolor;
+                    tempcolor = go.GetComponent<Renderer> ().material.color;
+                    go.GetComponent<Renderer> ().material.color = new Color(tempcolor.r,tempcolor.g,tempcolor.b,0.3f);
+                }
+            }
+            
+        }
         // Binding Textures. Wait to have pipeline running.
         private void Init()
         {
@@ -147,7 +348,8 @@ namespace OAKForUnity
         void Update()
         {
             
-            //parse the pose
+            
+            // parse the pose
             if (pipeline.deviceRunning && !_init) Init();
             bodyPoseResults.text = pipeline.bodyPoseResults;
             var json = JSON.Parse(pipeline.bodyPoseResults);
@@ -173,9 +375,9 @@ namespace OAKForUnity
                 {
                     if (x!=0 && y!=0 && z!=0)
                     {
-                        landmarks[index] = new Vector3(x/1000,y/1000,z/1000);
+                        //landmarks[index] = new Vector3(x/1000,y/1000,z/1000);
                         landmarks2D[index] = new Vector2(kx,ky);
-                        //print(landmarks[index]);
+                        
                     }
                 }
             }
@@ -191,7 +393,10 @@ namespace OAKForUnity
             landmarks2D[5] = new Vector2(shoulderL1.apply(landmarks2D[5][0]),shoulderL2.apply(landmarks2D[5][1]));
             landmarks2D[6] = new Vector2(shoulderR1.apply(landmarks2D[6][0]),shoulderR2.apply(landmarks2D[6][1]));
 
+            landmarks2D[11] = new Vector2(hipL1.apply(landmarks2D[11][0]),hipL2.apply(landmarks2D[11][1]));
+            landmarks2D[12] = new Vector2(hipR1.apply(landmarks2D[12][0]),hipR2.apply(landmarks2D[12][1]));
 
+            //Some distance calculation
             Vector2 hipmid2D;
             hipmid2D = (landmarks2D[11] + landmarks2D[12])/2;
             Vector2 shouldermid2D = (landmarks2D[5] + landmarks2D[6])/2;
@@ -203,59 +408,26 @@ namespace OAKForUnity
             float elbow2wristL = getDistance2D(landmarks2D[7],landmarks2D[9]);
             float elbow2wristR = getDistance2D(landmarks2D[8],landmarks2D[10]);
             
-            originalGameObject.transform.position = new Vector3(5.4f-hipmid2D.x*0.06854f,8.4f-hipmid2D.y*0.06792f,23.01f);
-            Base.transform.localPosition = new Vector3(0,0.001f,0);
-            Base.transform.eulerAngles = getAngleLeft(shouldermid2D,hipmid2D);
-            Vector3 lefthip = landmarks[11];
-            Vector3 righthip = landmarks[12];
-            //print(HipBoneLeft.transform.position);
-            Vector3 ShoulderLeftpos = landmarks[5];
-            Vector3 ShoulderRightpos = landmarks[6];
+            //Determine the root position of the whole model
+            RootBone.transform.localPosition = new Vector3(-0.0341f+hipmid2D.x*0.000484f,-0.0595f+hipmid2D.y*0.000484f,0f);
+            RootBone.transform.localScale = new Vector3(hipHalfdis*0.05f,hipHalfdis*0.05f,hipHalfdis*0.05f);
+            //Calculate the lean angle (forward and backward)
+            Vector3 leanAngle = new Vector3(-(90*shoulderHalfdis/hipHalfdis)+130,0,-180);
+            RootBone.transform.localEulerAngles = leanAngle;
 
-            Vector3 elbowLeftpos = landmarks[7];;
-            Vector3 elbowRightpos = landmarks[8];
+            //Calculate the lean angle (left and right)
+            Base.transform.localEulerAngles = -getAngleLeft(shouldermid2D,hipmid2D);
+            Base.transform.eulerAngles = new Vector3(Base.transform.eulerAngles.x,-180,Base.transform.eulerAngles.z);
 
-            Vector3 wristLeftpos = landmarks[9];
-            Vector3 wristRightpos = landmarks[10];
 
-            Vector3 kneeLeftpos = landmarks[13];
-            Vector3 kneeRightpos = landmarks[14];
 
-            float mainDis = getDistance((lefthip+righthip)/2,(ShoulderLeftpos+ShoulderRightpos)/2);
-            print(mainDis);
-            //RootBone.transform.position = (lefthip+righthip)/2;
-            //RootBone.transform.position = new Vector3(RootBone.transform.position.x,RootBone.transform.position.y,0);
-            //print(RootBone.transform.position);
-            //Abdomen.transform.localPosition = new Vector3(0,(mainDis)*0.01f,0); // Y axis is the half of the link length between the hip and the shoulder
-            Abdomen.transform.localPosition = new Vector3(0,hip2shoulder*0.0007046875f,0);
 
-            Chest.transform.localPosition = new Vector3(0,0.001f,0);
-
-            ShoulderBoneLeft.transform.localPosition = new Vector3(0,0.001f,0);
-            ShoulderBoneRight.transform.localPosition = new Vector3(0,0.001f,0);
-            //ShoulderBoneLeft.transform.eulerAngles = new Vector3(0.01f,0.01f,-90);
-            ShoulderBoneLeft.transform.eulerAngles = getAngleRight(landmarks2D[6],landmarks2D[5]);
-            //ShoulderBoneRight.transform.eulerAngles = new Vector3(0.01f,0.01f,90);
-            ShoulderBoneRight.transform.eulerAngles = getAngleRight(landmarks2D[5],landmarks2D[6]);
-            ShoulderLeft.transform.localPosition = new Vector3(0,shoulderHalfdis*0.0007046875f,0);
-            ShoulderRight.transform.localPosition = new Vector3(0,shoulderHalfdis*0.0007046875f,0);
-
-            ElbowLeft.transform.localPosition = new Vector3(0,shoulder2elbowL*0.0007046875f,0);
-            ElbowRight.transform.localPosition = new Vector3(0,shoulder2elbowR*0.0007046875f,0);
-
-            WristLeft.transform.localPosition = new Vector3(0,elbow2wristL*0.0007046875f,0);
-            WristRight.transform.localPosition = new Vector3(0,elbow2wristR*0.0007046875f,0);
-
-            HipLeft.transform.localPosition = new Vector3(0,hipHalfdis*0.0007046875f,0);
-            HipRight.transform.localPosition = new Vector3(0,hipHalfdis*0.0007046875f,0);
-            print(getAngleLeft(wristLeftpos,elbowLeftpos));
+            //Calculate the angle of the elbow and the shoulder
             ElbowLeft.transform.eulerAngles = getAngleRight(landmarks2D[10],landmarks2D[8]);
             ElbowRight.transform.eulerAngles = getAngleLeft(landmarks2D[9],landmarks2D[7]);
-            //print(ElbowLeft.transform.eulerAngles);
-            
+           
 
             ShoulderLeft.transform.eulerAngles = getAngleRight(landmarks2D[8],landmarks2D[6]);
-            //print(ShoulderLeft.transform.eulerAngles);
             ShoulderRight.transform.eulerAngles = getAngleLeft(landmarks2D[7],landmarks2D[5]);
         }
 
@@ -264,12 +436,6 @@ namespace OAKForUnity
             float depth;
             depth = Mathf.Sqrt(Mathf.Pow(length,2) - Mathf.Pow(x1 - x2,2) - Mathf.Pow(y1 - y2,2));
             return depth;
-        }
-        float getDistance (Vector3 point1, Vector3 point2)
-        {
-            float distance;
-            distance = Mathf.Sqrt( Mathf.Pow(point1.x - point2.x,2) + Mathf.Pow(point1.y - point2.y,2));
-            return distance;
         }
         float getDistance2D (Vector2 point1, Vector2 point2)
         {
@@ -281,9 +447,7 @@ namespace OAKForUnity
         Vector3 getAngleLeft(Vector2 point1, Vector2 point2)
         {
             Vector3 angle;
-            //angle.x = -Mathf.Atan(point1.y - point2.y/point1.z - point2.z)*180/Mathf.PI;
             angle.x = 0;
-            
             if (point1.x > point2.x)
             {
                 angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) + 90f;
@@ -294,10 +458,6 @@ namespace OAKForUnity
                 angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) - 90f;
                 
             }
-            //print((point1.x - point2.x)/(point1.y - point2.y));
-            //angle.z = -90f;
-            //angle.y = -Mathf.Atan(point1.z - point2.z/point1.x - point2.x)*180/Mathf.PI;
-            //angle.y = -Mathf.Atan((point1.z - point2.z)/(point1.x - point2.x))*180/Mathf.PI;
             angle.y = 0;
             
             return angle;
@@ -305,7 +465,6 @@ namespace OAKForUnity
         Vector3 getAngleRight(Vector2 point1, Vector2 point2)
         {
             Vector3 angle;
-            //angle.x = -Mathf.Atan(point1.y - point2.y/point1.z - point2.z)*180/Mathf.PI;
             angle.x = 0;
             
             if (point1.x > point2.x)
@@ -318,59 +477,9 @@ namespace OAKForUnity
                 angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) - 90f;
                 
             }
-            //angle.z = 0;
-            //print((point1.x - point2.x)/(point1.y - point2.y));
-            //angle.z = -90f;
-            //angle.y = -Mathf.Atan(point1.z - point2.z/point1.x - point2.x)*180/Mathf.PI;
-            //angle.y = -Mathf.Atan((point1.z - point2.z)/(point1.x - point2.x))*180/Mathf.PI;
             angle.y = 0;
             
             return angle;
         }
-        // Vector3 getAngleLeft(Vector3 point1, Vector3 point2)
-        // {
-        //     Vector3 angle;
-        //     //angle.x = -Mathf.Atan(point1.y - point2.y/point1.z - point2.z)*180/Mathf.PI;
-        //     angle.x = 0;
-            
-        //     if (point1.x > point2.x)
-        //     {
-        //         angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) - 90f;
-        //     }
-        //     else
-        //     {
-        //         angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) + 90f;
-        //     }
-        //     //print((point1.x - point2.x)/(point1.y - point2.y));
-        //     //angle.z = -90f;
-        //     //angle.y = -Mathf.Atan(point1.z - point2.z/point1.x - point2.x)*180/Mathf.PI;
-        //     //angle.y = -Mathf.Atan((point1.z - point2.z)/(point1.x - point2.x))*180/Mathf.PI;
-        //     angle.y = 0;
-            
-        //     return angle;
-        // }
-        // Vector3 getAngleRight(Vector3 point1, Vector3 point2)
-        // {
-        //     Vector3 angle;
-        //     //angle.x = -Mathf.Atan(point1.y - point2.y/point1.z - point2.z)*180/Mathf.PI;
-        //     angle.x = 0;
-            
-        //     if (point1.x < point2.x)
-        //     {
-        //         angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) + 90f;
-        //     }
-        //     else
-        //     {
-        //         angle.z = (Mathf.Atan((point1.y - point2.y)/(point1.x - point2.x))*180/Mathf.PI) - 90f;
-        //     }
-        //     //angle.z = 0;
-        //     //print((point1.x - point2.x)/(point1.y - point2.y));
-        //     //angle.z = -90f;
-        //     //angle.y = -Mathf.Atan(point1.z - point2.z/point1.x - point2.x)*180/Mathf.PI;
-        //     //angle.y = -Mathf.Atan((point1.z - point2.z)/(point1.x - point2.x))*180/Mathf.PI;
-        //     angle.y = 0;
-            
-        //     return angle;
-        // }
     }
 }
